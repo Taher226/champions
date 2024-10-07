@@ -1,66 +1,50 @@
 import {useNavigation} from '@react-navigation/native';
-import {useEffect, useState} from 'react';
-import DatePicker from 'react-native-date-picker';
-import {MultiSelect} from 'react-native-element-dropdown';
+import {useState} from 'react';
+
 import 'firebase/auth';
-import {
-  Button,
-  Keyboard,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import {Pressable, ScrollView, StyleSheet, Text, View} from 'react-native';
 import {Checkbox} from 'react-native-paper';
 import ButtonMultiselect, {ButtonLayout} from 'react-native-button-multiselect';
 import DropDown from '../components/DropDown';
-import {getAuth, createUserWithEmailAndPassword} from 'firebase/auth';
+import {createUserWithEmailAndPassword} from 'firebase/auth';
 import {auth} from '../config/firebase';
 import Icon from 'react-native-vector-icons/EvilIcons';
 import Input from '../components/Input';
 import ButtonG from '../components/ButtonG';
-import {Formik} from 'formik';
-import * as Yup from 'yup';
+
 import {storeData} from '../util/http';
 
-function RegisterScreen({onSubmit, defaultValues}) {
+function RegisterScreen() {
   const [checked, setChecked] = useState(true);
+
   const [selectedButtons, setSelectedButtons] = useState([]);
-  const navigation = useNavigation();
-
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-
   const buttons = [
     {label: 'Male', value: 'Male'},
     {label: 'Female', value: 'Female'},
   ];
-
   const handleButtonSelected = selectedValues => {
     setSelectedButtons(selectedValues);
   };
 
   const [inputs, setInputs] = useState({
     name: {
-      value: defaultValues ? defaultValues.name : '',
+      value: '',
       isValid: true,
     },
     date: {
-      value: defaultValues ? getFormattedDate(defaultValues.date) : '',
+      value: '',
       isValid: true,
     },
     email: {
-      value: defaultValues ? defaultValues.email : '',
+      value: '',
       isValid: true,
     },
     password: {
-      value: defaultValues ? defaultValues.password : '',
+      value: '',
       isValid: true,
     },
     mobile: {
-      value: defaultValues ? defaultValues.mobile : '',
+      value: '',
       isValid: true,
     },
   });
@@ -95,8 +79,6 @@ function RegisterScreen({onSubmit, defaultValues}) {
       !passwordIsValid ||
       !mobileIsValid
     ) {
-      //Alert.alert('Invalid Input', 'Please check your input values');
-
       setInputs(curInputs => {
         return {
           name: {value: curInputs.name.value, isValid: nameIsValid},
@@ -119,86 +101,9 @@ function RegisterScreen({onSubmit, defaultValues}) {
     !inputs.password.isValid ||
     !inputs.mobile.isValid;
 
-  ////////////////////////Validation 1//////////////////////
-  // useEffect(() => {
-  //   validateForm();
-  // }, [name, email, password, date, mobile, buttons, language]);
-
-  // const validateForm = () => {
-  //   let errors = {};
-
-  //   if (!name) {
-  //     errors.name = 'Name is required';
-  //   }
-  //   if (!email) {
-  //     errors.email = 'Email is required';
-  //   } else if (!/\S+@\S+\.\S+/.test(email)) {
-  //     errors.email = 'Email is Invalid';
-  //   }
-  //   if (!password) {
-  //     errors.name = 'Name is required';
-  //   } else if (password.length < 6) {
-  //     errors.password = 'password must be at least 6 characters';
-  //   }
-  //   if (!date) {
-  //     errors.date = 'Date is required';
-  //   }
-  //   if (!mobile) {
-  //     errors.mobile = 'Mobile Number is required';
-  //   }
-  //   if (!buttons) {
-  //     errors.buttons = 'Gender is required';
-  //   }
-  //   if (!language) {
-  //     errors.language = 'Learning Language is required';
-  //   }
-
-  //   setErrors(errors);
-  //   setIsFormValid(Object.keys(errors).length === 0);
-  // };
-
-  ////////////////////////Validation1//////////////////////
-
-  ////////////////////////Validation 2//////////////////////
-  //Before Register Function
-
-  //  const SignupSchema = Yup.object().shape({
-  //   name: Yup.string()
-  //     .min(2, 'Too Short!')
-  //     .max(50, 'Too Long!')
-  //     .required('Enter your Full Name'),
-
-  //   email: Yup.string().email('Invalid email').required('Required'),
-  // });
-  //After Return
-  //  <Formik
-  //  initialValues={{
-  //    email: '',
-  //    name: '',
-  //    mobile: '',
-  //    birthDate: '',
-  //    Gender: '',
-  //    language: '',
-  //    password: '',
-  //  }}
-  //  validationSchema={SignupSchema}>
-  //  {({
-  //    values,
-  //    errors,
-  //    touched,
-  //    handleChange,
-  //    setFieldTouched,
-  //    isValid,
-  //    handleSubmit,
-  //  }) => { ALL RETURN HERE }}
-  // </Formik>
-  ////////////////////////Validation2//////////////////////
-
   //////////////////////firebase///////////////////////////
 
   const handleSubmit = async registerData => {
-    //if (isFormValid) {
-
     try {
       let x = createUserWithEmailAndPassword(
         auth,
@@ -214,10 +119,6 @@ function RegisterScreen({onSubmit, defaultValues}) {
       Alert.alert('Error Here !!!!');
     }
   };
-  //console.log('form submitted successfully!');
-  // } else {
-  //   console.log('Form has errors. Please correct them.');
-  // }
 
   ///////////////////////////firebase//////////////////////
 
@@ -228,7 +129,6 @@ function RegisterScreen({onSubmit, defaultValues}) {
           label="* Email"
           placeholder="Enter your Email"
           invalid={!inputs.email.isValid}
-          //error={'Input Email'}
           value={inputs.email.value}
           onChangeText={inputChangedHandler.bind(this, 'email')}
         />
@@ -256,35 +156,11 @@ function RegisterScreen({onSubmit, defaultValues}) {
           invalid={!inputs.date.isValid}
           value={inputs.date.value}
           onChangeText={inputChangedHandler.bind(this, 'date')}
-          // onPress={() => setOpen(true)}
         />
-
-        {/* <DatePicker
-          modal
-          mode="date"
-          open={open}
-          date={new Date()}
-          //title={date}
-          onConfirm={value => {
-            setOpen(false);
-            setDate(
-              value.getFullYear().toString() +
-                '-' +
-                value.getMonth().toString() +
-                '-' +
-                value.getDate(date).toString(),
-            );
-
-            console.log(value);
-          }}
-          onCancel={() => {
-            setOpen(false);
-          }}
-        /> */}
 
         <Text style={[styles.text, {marginBottom: 3}]}>Gender</Text>
         <ButtonMultiselect
-          layout={ButtonLayout.FULL_WIDTH} // Choose from ButtonLayout enum: CAROUSEL, FULL_WIDTH, GRID
+          layout={ButtonLayout.FULL_WIDTH}
           buttons={buttons}
           selectedButtons={selectedButtons}
           onButtonSelected={handleButtonSelected}
@@ -296,7 +172,6 @@ function RegisterScreen({onSubmit, defaultValues}) {
             borderColor: 'white',
             textColor: 'white',
           }}
-          // Additional props can be customized as needed
         />
 
         <Text style={styles.text}>Learning Language</Text>
@@ -338,16 +213,7 @@ function RegisterScreen({onSubmit, defaultValues}) {
           </Pressable>
         </View>
 
-        <ButtonG
-          title={'Register'}
-          onPress={validateHandler}
-          // disabled={!isFormValid}
-        />
-        {/* {Object.values(errors).map((error, index) => (
-          <Text key={index} style={styles.error}>
-            {error}
-          </Text>
-        ))} */}
+        <ButtonG title={'Register'} onPress={validateHandler} />
       </View>
     </ScrollView>
   );
