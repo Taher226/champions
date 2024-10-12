@@ -35,10 +35,10 @@ const Input = ({
           inputStyles,
           {
             flexDirection: 'row',
-            borderColor: error ? 'red' : isFocused ? 'transparent' : 'white',
           },
         ]}>
         <TextInput
+          style={{paddingLeft: 10}}
           secureTextEntry={hidePassword}
           onFocus={() => {
             onFocus();
@@ -54,7 +54,8 @@ const Input = ({
             <Icon
               name={hidePassword ? 'eye-outline' : 'eye-off-outline'}
               size={22}
-              style={{paddingTop: 15}}
+              color="black"
+              style={styles.iconStyle}
             />
           </TouchableOpacity>
         )}
@@ -73,22 +74,25 @@ const styles = StyleSheet.create({
     paddingTop: 8,
   },
   input: {
-    //justifyContent: 'flex-end',
     width: 390,
-    //marginHorizontal: 20,
     marginVertical: 8,
     fontSize: 16,
     elevation: 0.5,
     borderRadius: 15,
     backgroundColor: 'white',
-    borderWidth: 1,
     borderRadius: 15,
   },
   invalidLabel: {
     color: 'red',
   },
   invalidInput: {
-    backgroundColor: '#e45959',
+    borderColor: 'red',
+    borderWidth: 1,
+    borderRadius: 15,
+  },
+  iconStyle: {
+    paddingTop: 15,
+    marginLeft: 170,
   },
 });
 export default Input;

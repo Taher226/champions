@@ -2,7 +2,14 @@ import {useNavigation} from '@react-navigation/native';
 import {useState} from 'react';
 
 import 'firebase/auth';
-import {Pressable, ScrollView, StyleSheet, Text, View} from 'react-native';
+import {
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
 import {Checkbox} from 'react-native-paper';
 import ButtonMultiselect, {ButtonLayout} from 'react-native-button-multiselect';
 import DropDown from '../components/DropDown';
@@ -11,21 +18,27 @@ import {auth} from '../config/firebase';
 import Icon from 'react-native-vector-icons/EvilIcons';
 import Input from '../components/Input';
 import ButtonG from '../components/ButtonG';
-
 import {storeData} from '../util/http';
+import GenderContainer from '../components/GenderContainer';
+import MultiSelectModal from '../components/MultiselectModal';
+import CalendarComponent from '../components/CalenderComponent';
+import DatePicker from 'react-native-date-picker';
+import {Calendar} from 'react-native-calendar';
+import TitleText from '../components/TitleText';
+import moment from 'moment';
 
 function RegisterScreen() {
   const [checked, setChecked] = useState(true);
+  const [open, setOpen] = useState(false);
+  const [date, setDate] = useState('');
 
-  const [selectedButtons, setSelectedButtons] = useState([]);
-  const buttons = [
-    {label: 'Male', value: 'Male'},
-    {label: 'Female', value: 'Female'},
-  ];
-  const handleButtonSelected = selectedValues => {
-    setSelectedButtons(selectedValues);
+  const [selectedOption, setSelectedOption] = useState('');
+  const handleSelection = type => {
+    setSelectedOption(type);
   };
+  const [selectedLanguage, setSelectedLanguage] = useState([]);
 
+  /////////////////////////Validation////////////////////////////
   const [inputs, setInputs] = useState({
     name: {
       value: '',
@@ -47,7 +60,25 @@ function RegisterScreen() {
       value: '',
       isValid: true,
     },
+    gender: {
+      value: '',
+      isValid: true,
+    },
+    languagee: {
+      value: [...language],
+      isValid: true,
+    },
   });
+
+  const language = [
+    {id: 1, label: 'English'},
+    {id: 2, label: 'French'},
+    {id: 3, label: 'Spanish'},
+    {id: 4, label: 'Turkish'},
+    {id: 5, label: 'German'},
+    {id: 6, label: 'Dutch'},
+  ];
+
   function inputChangedHandler(inputIdentifier, enteredValue) {
     setInputs(curInputs => {
       return {
@@ -64,6 +95,8 @@ function RegisterScreen() {
       email: inputs.email.value,
       password: inputs.password.value,
       mobile: inputs.mobile.value,
+      gender: inputs.gender.value,
+      languagee: inputs.languagee.value,
     };
     const nameIsValid = registerData.name.trim().length > 0;
     const dateIsValid = registerData.date.toString() !== 'Invalid Date';
@@ -71,13 +104,17 @@ function RegisterScreen() {
     const passwordIsValid = registerData.password.trim().length > 0;
     const mobileIsValid =
       !isNaN(registerData.mobile) && registerData.mobile > 0;
+    const genderIsValid = registerData.gender.trim().length > 0;
+    const languageIsValid = registerData.languagee.length > 0;
 
     if (
       !nameIsValid ||
       !dateIsValid ||
       !emailIsValid ||
       !passwordIsValid ||
-      !mobileIsValid
+      !mobileIsValid ||
+      !genderIsValid ||
+      !languageIsValid
     ) {
       setInputs(curInputs => {
         return {
@@ -86,6 +123,11 @@ function RegisterScreen() {
           email: {value: curInputs.email.value, isValid: emailIsValid},
           password: {value: curInputs.password.value, isValid: passwordIsValid},
           mobile: {value: curInputs.mobile.value, isValid: mobileIsValid},
+          gender: {value: curInputs.gender.value, isValid: genderIsValid},
+          language: {
+            value: curInputs.languagee.value,
+            isValid: languageIsValid,
+          },
         };
       });
 
@@ -99,13 +141,16 @@ function RegisterScreen() {
     !inputs.date.isValid ||
     !inputs.email.isValid ||
     !inputs.password.isValid ||
-    !inputs.mobile.isValid;
+    !inputs.mobile.isValid ||
+    !inputs.gender.isValid ||
+    !inputs.languagee.isValid;
+  /////////////////////////Validation////////////////////////////
 
-  //////////////////////firebase///////////////////////////
+  /////////////////////////firebase/////////////////////////////
 
   const handleSubmit = async registerData => {
     try {
-      let x = createUserWithEmailAndPassword(
+      createUserWithEmailAndPassword(
         auth,
         inputs.email.value,
         inputs.password.value,
@@ -120,7 +165,7 @@ function RegisterScreen() {
     }
   };
 
-  ///////////////////////////firebase//////////////////////
+  /////////////////////////firebase/////////////////////////////
 
   return (
     <ScrollView>
@@ -132,6 +177,9 @@ function RegisterScreen() {
           value={inputs.email.value}
           onChangeText={inputChangedHandler.bind(this, 'email')}
         />
+        {!inputs.email.isValid && (
+          <Text style={styles.error}>Invalid Email</Text>
+        )}
 
         <Input
           label="Name"
@@ -140,7 +188,7 @@ function RegisterScreen() {
           value={inputs.name.value}
           onChangeText={inputChangedHandler.bind(this, 'name')}
         />
-
+        {!inputs.name.isValid && <Text style={styles.error}>Invalid Name</Text>}
         <Input
           label="Mobile Number"
           placeholder="Mobile Number"
@@ -149,34 +197,100 @@ function RegisterScreen() {
           value={inputs.mobile.value}
           onChangeText={inputChangedHandler.bind(this, 'mobile')}
         />
-
+        {!inputs.mobile.isValid && (
+          <Text style={styles.error}>Invalid Mobile Number</Text>
+        )}
         <Input
           label="Birth Date"
           placeholder="2002-06-22"
           invalid={!inputs.date.isValid}
           value={inputs.date.value}
           onChangeText={inputChangedHandler.bind(this, 'date')}
-        />
-
-        <Text style={[styles.text, {marginBottom: 3}]}>Gender</Text>
-        <ButtonMultiselect
-          layout={ButtonLayout.FULL_WIDTH}
-          buttons={buttons}
-          selectedButtons={selectedButtons}
-          onButtonSelected={handleButtonSelected}
-          unselectedColors={{
-            borderColor: '#dbd8d8',
-          }}
-          selectedColors={{
-            backgroundColor: '#07b2bc',
-            borderColor: 'white',
-            textColor: 'white',
+          onPress={() => {
+            setOpen(true);
           }}
         />
+        {/* {console.log(inputs)} */}
 
-        <Text style={styles.text}>Learning Language</Text>
-        <DropDown />
+        <DatePicker
+          modal
+          mode="date"
+          open={open}
+          date={new Date()}
+          //title={date}
+          onConfirm={value => {
+            setOpen(false);
+            inputChangedHandler('date', moment(value).format('YYYY-MM-DD'));
 
+            // setDate(
+            //   value.getFullYear().toString() +
+            //     '-' +
+            //     value.getMonth().toString() +
+            //     '-' +
+            //     value.getDate(date).toString(),
+            // );
+            // console.log(value);
+          }}
+          onCancel={() => {
+            setOpen(false);
+          }}
+        />
+        {!inputs.date.isValid && <Text style={styles.error}>Invalid Date</Text>}
+
+        <TitleText invalid={!inputs.gender.isValid} label={'Gender'} />
+        <View style={{flexDirection: 'row'}}>
+          <GenderContainer
+            type={'Male'}
+            selected={inputs.gender.value === 'Male'}
+            onPress={type => {
+              inputChangedHandler('gender', type);
+            }}
+            invalid={!inputs.gender.isValid}
+          />
+
+          <GenderContainer
+            type={'Female'}
+            selected={inputs.gender.value === 'Female'}
+            onPress={type => {
+              inputChangedHandler('gender', type);
+            }}
+            invalid={!inputs.gender.isValid}
+          />
+        </View>
+        {!inputs.gender.isValid && (
+          <Text style={styles.error}>Invalid Gender</Text>
+        )}
+
+        <TitleText
+          invalid={!inputs.languagee.isValid}
+          label={'Learning Language'}
+        />
+
+        <MultiSelectModal
+          onPress={language => {
+            if (
+              selectedLanguage.find(items => {
+                items.id == language.id;
+              })
+            ) {
+              setSelectedLanguage(
+                selectedLanguage.filter(items => {
+                  items.id !== language.id;
+                }),
+              );
+            } else {
+              setSelectedLanguage([...selectedLanguage, language]);
+            }
+          }}
+          //selected={selectedLanguage}
+          data={language}
+          invalid={!inputs.languagee.isValid}
+          value={inputs.languagee.value}
+        />
+
+        {!inputs.languagee.isValid && (
+          <Text style={styles.error}>Invalid Language</Text>
+        )}
         <Input
           label={'* Password'}
           placeholder="Enter your Password"
@@ -185,6 +299,9 @@ function RegisterScreen() {
           value={inputs.password.value}
           onChangeText={inputChangedHandler.bind(this, 'password')}
         />
+        {!inputs.password.isValid && (
+          <Text style={styles.error}>Invalid password</Text>
+        )}
 
         <View style={styles.conditions}>
           <Checkbox
@@ -255,7 +372,7 @@ const styles = StyleSheet.create({
   },
   error: {
     color: 'red',
-    fontSize: 20,
+    fontSize: 13,
     marginBottom: 12,
   },
 });
