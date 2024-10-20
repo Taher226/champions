@@ -5,6 +5,7 @@ import {
   StatusBar,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
@@ -14,10 +15,15 @@ import LoginScreen from './screens/LoginScreen';
 import RegisterScreen from './screens/RegisterScreen';
 import WelcomeScreen from './screens/WelcomeScreen';
 import useAuth from './hooks/useAuth';
+import {auth} from './config/firebase';
+import {signOut} from 'firebase/auth';
 
 const Stack = createNativeStackNavigator();
 
 function App() {
+  const handleLogout = async () => {
+    await signOut(auth);
+  };
   const {user} = useAuth();
   if (user) {
     return (
@@ -27,9 +33,27 @@ function App() {
         <NavigationContainer>
           <Stack.Navigator
             screenOptions={{
-              contentStyle: {backgroundColor: '#f7f5f5'},
+              contentStyle: {backgroundColor: '#fafbfd'},
             }}>
-            <Stack.Screen name="WelcomeScreen" component={WelcomeScreen} />
+            <Stack.Screen
+              name="WelcomeScreen"
+              component={WelcomeScreen}
+              options={{
+                title: 'Mentors',
+                headerRight: () => {
+                  return (
+                    <TouchableOpacity onPress={handleLogout}>
+                      <Icon
+                        name="log-out-outline"
+                        size={25}
+                        color="#06aab4"
+                        style={{padding: 7}}
+                      />
+                    </TouchableOpacity>
+                  );
+                },
+              }}
+            />
           </Stack.Navigator>
         </NavigationContainer>
       </>
@@ -42,7 +66,7 @@ function App() {
         <NavigationContainer>
           <Stack.Navigator
             screenOptions={{
-              contentStyle: {backgroundColor: '#f7f5f5'},
+              contentStyle: {backgroundColor: '#fafbfd'},
             }}>
             <Stack.Screen
               name="LoginScreen"

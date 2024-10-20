@@ -1,32 +1,78 @@
-import {signOut} from 'firebase/auth';
 import {
+  FlatList,
   Image,
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
-import {auth} from '../config/firebase';
+import TeacherList from '../components/TeacherList';
+import {SearchBar} from 'react-native-screens';
+import Icon from 'react-native-vector-icons/Ionicons';
+import {useState} from 'react';
+import {TEACHERS} from '../data/teachersData';
+import TeacherItem from '../components/TeacherItem';
 
 function WelcomeScreen() {
-  const handleLogout = async () => {
-    await signOut(auth);
-  };
+  const [searchText, setSearchText] = useState('');
+
   return (
-    <View style={styles.fullContainer}>
-      <Image
-        source={require('../assets/images/championsLogo.png')}
-        style={styles.image}
-      />
-      <Text style={styles.text}>Welcome To Champions</Text>
-      <TouchableOpacity
-        onPress={handleLogout}
-        style={({pressed}) => (pressed ? styles.pressed : null)}>
-        <View style={styles.buttonContainer}>
-          <Text style={styles.button}>Log Out</Text>
+    <View>
+      <View
+        style={{
+          flexDirection: 'row',
+          backgroundColor: 'white',
+          alignSelf: 'center',
+          borderRadius: 15,
+          elevation: 1,
+          paddingHorizontal: 4,
+          top: 4,
+        }}>
+        <Icon name="search-outline" size={20} style={{alignSelf: 'center'}} />
+        <TextInput
+          placeholder="Search..."
+          clearButtonMode="always"
+          autoCapitalize="none"
+          autoCorrect={false}
+          value={searchText}
+          onChangeText={setSearchText}
+          style={{
+            borderRadius: 15,
+            paddingVertical: 5,
+            width: '80%',
+          }}
+        />
+        <View
+          style={{
+            backgroundColor: '#e2e6ef',
+            height: '98%',
+            width: '9%',
+            borderRadius: 10,
+            left: 3,
+          }}>
+          <Pressable>
+            <Image
+              source={require('../assets/icons/filter.png')}
+              style={{
+                height: 18,
+                width: 18,
+                tintColor: '#00a293',
+                top: 10,
+                left: 9,
+              }}
+            />
+          </Pressable>
         </View>
-      </TouchableOpacity>
+      </View>
+      <TeacherList searchName={searchText} />
+      {/* <FlatList
+        data={TEACHERS}
+        keyExtractor={item => item.id}
+        renderItem={renderTeacherItem}
+      /> */}
     </View>
   );
 }
