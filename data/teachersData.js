@@ -2,8 +2,7 @@ export const TEACHERS = [
   {
     name: 'Dr.Maged Saeed',
     type: 'Mentor',
-    category: `Schools and educational
-Organizations, Study skills ...`,
+    category: `Schools and educational Organizations, Study skills Schools and educational Organizations, Study skills`,
     languages: ['Arabic', 'English'],
     numberOfSessions: 0,
     imageUrl: require('../assets/images/m.jpg'),
@@ -23,6 +22,14 @@ Organizations, Study skills ...`,
     languages: ['Arabic', 'English'],
     numberOfSessions: 0,
     imageUrl: require('../assets/images/ww.jpg'),
+  },
+  {
+    name: 'Rehab Ibrahim',
+    type: 'Mentor',
+    category: 'Parents , educational',
+    languages: ['Arabic', 'English'],
+    numberOfSessions: 0,
+    imageUrl: require('../assets/images/w.jpg'),
   },
   {
     name: 'Rehab Ibrahim',

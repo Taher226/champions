@@ -1,8 +1,6 @@
 import {FlatList, Text, View, TextInput, Pressable, Image} from 'react-native';
 import {TEACHERS} from '../data/teachersData';
 import TeacherItem from './TeacherItem';
-import Icon from 'react-native-vector-icons/Ionicons';
-import {useState} from 'react';
 
 const TeacherList = ({searchName}) => {
   const showData = () => {
@@ -41,7 +39,7 @@ const TeacherList = ({searchName}) => {
   // };
 
   return (
-    <View>
+    <View style={{flex: 1}}>
       <FlatList
         data={showData()}
         keyExtractor={item => item.id}

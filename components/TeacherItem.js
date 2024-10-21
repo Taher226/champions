@@ -1,4 +1,13 @@
-import {TouchableOpacity, View, StyleSheet, Image, Text} from 'react-native';
+import {
+  TouchableOpacity,
+  View,
+  StyleSheet,
+  Image,
+  Text,
+  ScrollView,
+  Dimensions,
+} from 'react-native';
+import {width} from '../consts/consts';
 
 function TeacherItem({
   name,
@@ -9,13 +18,13 @@ function TeacherItem({
   imageUrl,
 }) {
   return (
-    <View style={styles.Item}>
+    <View style={styles.card}>
       <TouchableOpacity>
         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
           <Text
             style={{
               fontSize: 15,
-              fontWeight: 'bold',
+              fontWeight: '900',
               color: 'black',
               padding: 10,
             }}>
@@ -24,10 +33,8 @@ function TeacherItem({
           <View
             style={{
               backgroundColor: type == 'Mentor' ? '#06aab4' : 'red',
-              //borderRadius: 7,
               padding: 3,
               height: '60%',
-              // margin: 5,
               borderTopRightRadius: 10,
               borderBottomLeftRadius: 10,
             }}>
@@ -42,12 +49,10 @@ function TeacherItem({
           </View>
         </View>
         <View style={{flexDirection: 'row'}}>
-          <Image
-            source={imageUrl} // need to be fixed
-            style={styles.image}
-          />
-          <View>
+          <Image source={imageUrl} style={styles.image} />
+          <View style={{width: width * 0.6}}>
             <Text
+              numberOfLines={2}
               style={{
                 fontSize: 15,
                 color: '#13b3a3',
@@ -61,18 +66,20 @@ function TeacherItem({
               {languages.map(language => {
                 return (
                   <View
+                    key={language.id}
                     style={{
                       backgroundColor: language == 'Arabic' ? '#06aab4' : 'red',
                       borderRadius: 7,
                       marginHorizontal: 5,
-                      width: '25%',
+                      padding: 4,
+                      paddingHorizontal: 7,
+                      //width: '25%',
                     }}>
                     <Text
-                      key={language.id}
                       style={{
                         fontSize: 10,
                         color: 'white',
-                        padding: 4,
+                        //padding: 4,
                         textAlign: 'center',
                       }}>
                       {language}
@@ -84,12 +91,20 @@ function TeacherItem({
             <View
               style={{
                 backgroundColor: '#e9fbfb',
+
                 borderRadius: 8,
-                width: '100%',
+                //width: '100%',
                 marginVertical: 15,
                 marginHorizontal: 5,
+                padding: 2,
+                alignSelf: 'flex-start',
               }}>
-              <Text style={{color: '#4ea5a5', padding: 1, fontSize: 12}}>
+              <Text
+                style={{
+                  color: '#4ea5a5',
+                  fontSize: 12,
+                  textAlign: 'center',
+                }}>
                 {numOfSessions} Sessions Available
               </Text>
             </View>
@@ -101,18 +116,21 @@ function TeacherItem({
 }
 
 const styles = StyleSheet.create({
-  Item: {
+  card: {
     margin: 13,
     borderRadius: 8,
     backgroundColor: 'white',
-    elevation: 4,
+    elevation: 2,
   },
 
   image: {
     marginHorizontal: 5,
-    width: '35%',
+    //width: '35%',
     height: '97%',
     borderRadius: 25,
+    //flex: 0.5,
+    maxWidth: width * 0.3,
+    minWidth: width * 0.2,
   },
 });
 export default TeacherItem;

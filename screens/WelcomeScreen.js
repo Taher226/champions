@@ -20,7 +20,7 @@ function WelcomeScreen() {
   const [searchText, setSearchText] = useState('');
 
   return (
-    <View>
+    <View style={{flex: 1}}>
       <View
         style={{
           flexDirection: 'row',
